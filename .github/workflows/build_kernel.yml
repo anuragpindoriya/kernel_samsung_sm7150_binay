@@ -70,11 +70,12 @@ jobs:
 
         sudo apt install binutils make python3 libssl-dev build-essential bc  bison flex unzip libssl-dev ca-certificates xz-utils mkbootimg cpio device-tree-compiler git git-lfs -y
 
-        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.5/clang+llvm-16.0.5-aarch64-linux-gnu.tar.xz
-
+        curl -Ls $(curl -s https://api.github.com/repos/ZyCromerZ/Clang/releases/latest | grep "browser_download_url" | cut -d '"' -f 4) -o clang.tar.gz
+       
         mkdir clang
-        tar -xzvf clang+llvm-16.0.5-aarch64-linux-gnu.tar.xz -C clang
-
+         
+        tar -xzvf clang.tar.gz -C clang
+        
         make clean
         make mrproper
 
