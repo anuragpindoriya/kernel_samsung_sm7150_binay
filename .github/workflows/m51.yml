@@ -45,9 +45,12 @@ jobs:
         id: get_time
         run: echo "TIME=$(TZ=UTC-8 date +%m%d%H%M )" >> $GITHUB_ENV
 
-      - name: Build Kernel
+      - name: Build Kernel-With-KernelSU
         run: |
           set -x
+          rm -rf KernelSU
+          rm -rf drivers/kernelsu
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main   
           export PATH=$(pwd)/proton-clang/bin/:$PATH
           export CC=clang
           export CLANG_TRIPLE=aarch64-linux-gnu-
