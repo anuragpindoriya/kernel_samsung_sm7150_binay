@@ -129,6 +129,5 @@ jobs:
         with:
           name: Out_folder_of_kernel
           path: |
-                  out/AK3/*.zip
                   out/
       
