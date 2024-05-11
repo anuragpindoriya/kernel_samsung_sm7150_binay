@@ -81,7 +81,7 @@ jobs:
       - name: Start Build Kernel
         run: |
           make $KERNEL_CMDLINE $KERNEL_DEFCONFIG CC="ccache clang"
-          make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all) LOCALVERSION="-An-UNKNOWN-${{ env.FINAL_TAG }}-"
+          make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all) LOCALVERSION="-😍-An-UNKNOWN-${{ env.FINAL_TAG }}-😍"
 
 
       - name: Pack Kernel Image In AnyKernel3
