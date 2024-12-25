@@ -38,6 +38,7 @@ jobs:
         run: |
           echo "This build is not compatible with branch '${{ github.event.ref_name }}'. Skipping..."
           exit 0
+        shell: bash
 
       # Checkout repository
       - name: Checkout
