@@ -30,6 +30,10 @@ jobs:
       KERNEL_CMDLINE: "ARCH=arm64 CC=clang CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- O=out"
 
     steps:
+      - name: Filter Branch
+        if: github.ref_name != matrix.kernelsu_version.branch
+        run: echo "This build is not compatible with branch '${{ github.ref_name }}'. Skipping..." && exit 0
+
       # Checkout repository
       - name: Checkout
         uses: actions/checkout@v4.1.1
