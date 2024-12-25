@@ -6,10 +6,10 @@ on:
     - cron: '0 0 * * 6'
   push:
     branches:
-      - main
+      - stable
   pull_request:
     branches:
-      - main
+      - stable
 
 jobs:
   build:
