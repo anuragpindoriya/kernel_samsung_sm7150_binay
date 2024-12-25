@@ -17,9 +17,9 @@ jobs:
     strategy:
       matrix:
         kernelsu_version:
-          - {url: "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh", name: KernelSU, version: v0.9.5, command: "-s v0.9.5"}
+          - {url: "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh", name: KernelSU, version: KernelSU-v0.9.5, command: "-s v0.9.5"}
           - {url: "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh", name: KernelSU-Next, version: KernelSU-Next, command: "-"}
-          - {url: "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh", name: KernelSU-Next-SUS, version: KernelSU-Next-SUS, command: "-s next-susfs-4.14"}
+          - {url: "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh", name: KernelSU-Next, version: KernelSU-Next-SUS, command: "-s next-susfs-4.14"}
 
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
@@ -83,13 +83,15 @@ jobs:
         run: |
           timestamp=$(TZ=UTC-8 date +%Y%m%d%H%M)
           file_tag="${{ matrix.kernelsu_version.version }}.${timestamp}"
+          kernel_name_tag="${{ matrix.kernelsu_version.version }}"
           echo "FILE_TAG=$file_tag" >> $GITHUB_ENV
+          echo "KERNEL_NAME_TAG=$kernel_name_tag" >> $GITHUB_ENV
 
       # Start kernel build
       - name: Start Build Kernel
         run: |
           make $KERNEL_CMDLINE $KERNEL_DEFCONFIG CC="ccache clang"
-          make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all) LOCALVERSION="-😍-An-${{ matrix.kernelsu_version.name }}-${{ env.FILE_TAG }}-😍"
+          make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all) LOCALVERSION="-😍-An-UNKNOWN-${{ env.KERNEL_NAME_TAG }}-😍"
 
       # Pack kernel into AnyKernel3 zip
       - name: Pack Kernel Image In AnyKernel3
@@ -101,7 +103,7 @@ jobs:
             cp out/arch/arm64/boot/dts/qcom/sdmmagpie.dtb out/AK3/dtb
           fi
           cd out/AK3
-          zip -r9 An-${{ matrix.kernelsu_version.name }}-${{ env.FILE_TAG }}-"$(/bin/date -u '+%Y%m%d-%H%M')".zip .
+          zip -r9 An-UNKNOWN-${{ env.FILE_TAG }}-"$(/bin/date -u '+%Y%m%d-%H%M')".zip .
 
       # Release kernel to GitHub
       - name: Release Kernel TO GitHub
@@ -119,6 +121,6 @@ jobs:
       - name: Upload Kernel Artifacts
         uses: actions/upload-artifact@v4.0.0
         with:
-          name: Kernel_Output_${{ matrix.kernelsu_version.name }}
+          name: Kernel_Output_${{ matrix.kernelsu_version.version }}
           path: |
             out/arch
