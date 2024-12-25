@@ -35,7 +35,9 @@ jobs:
       # Filter builds based on the branch
       - name: Filter Branch
         if: github.ref_name != matrix.kernelsu_version.branch
-        run: echo "This build is not compatible with branch '${{ github.ref_name }}'. Skipping..." && exit 0
+        run: |
+          echo "This build is not compatible with branch '${{ github.event.ref_name }}'. Skipping..."
+          exit 0
 
       # Checkout repository
       - name: Checkout
