@@ -33,12 +33,14 @@ jobs:
 
     steps:
       # Filter builds based on the branch
-      - name: Filter Branch
-        if: github.ref_name != matrix.kernelsu_version.branch
+      - name: debug
         run: |
-          echo "This build is not compatible with branch '${{ github.event.ref_name }}'. Skipping..."
-          exit 0
-        shell: bash
+          echo "Branch Name: ${{ env.BRANCH_NAME }}"
+          echo "Matrix Branch: ${{ matrix.kernelsu_version.branch }}"
+
+      - name: Filter Branch
+        if: ${{ github.ref_name != matrix.kernelsu_version.branch }}
+        
 
       # Checkout repository
       - name: Checkout
