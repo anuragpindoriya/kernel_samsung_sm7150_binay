@@ -6,10 +6,12 @@ on:
     - cron: '0 0 * * 6'
   push:
     branches:
-      - HEAD
+      - stable
+      - susfs-supported
   pull_request:
     branches:
-      - HEAD
+      - stable
+      - susfs-supported
 
 jobs:
   build:
@@ -17,9 +19,9 @@ jobs:
     strategy:
       matrix:
         kernelsu_version:
-          - {url: "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh", name: KernelSU, version: KernelSU-v0.9.5, command: "-s v0.9.5"}
-          - {url: "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh", name: KernelSU-Next, version: KernelSU-Next, command: "-"}
-          - {url: "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh", name: KernelSU-Next, version: KernelSU-Next-SUS, command: "-s next-susfs-4.14"}
+          - {url: "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh", name: KernelSU, version: KernelSU-v0.9.5, command: "-s v0.9.5", branch: stable}
+          - {url: "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh", name: KernelSU-Next, version: KernelSU-Next, command: "-", branch: stable}
+          - {url: "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh", name: KernelSU-Next, version: KernelSU-Next-SUS, command: "-s next-susfs-4.14", branch: susfs-supported}
 
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
@@ -30,6 +32,11 @@ jobs:
       KERNEL_CMDLINE: "ARCH=arm64 CC=clang CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- O=out"
 
     steps:
+      # Filter builds based on the branch
+      - name: Filter Branch
+        if: github.ref_name != matrix.kernelsu_version.branch
+        run: echo "This build is not compatible with branch '${{ github.ref_name }}'. Skipping..." && exit 0
+
       # Checkout repository
       - name: Checkout
         uses: actions/checkout@v4.1.1
