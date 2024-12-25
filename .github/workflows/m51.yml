@@ -57,11 +57,6 @@ jobs:
           mkdir clang
           tar -xzvf clang.tar.gz -C clang
 
-      # Get current timestamp
-      - name: Get Time
-        id: get_time
-        run: echo "TIME=$(TZ=UTC-8 date +%m%d%H%M)" >> $GITHUB_ENV
-
       # Apply KernelSU version from matrix
       - name: Apply KernelSU Version
         run: |
@@ -112,22 +107,32 @@ jobs:
           cd out/AK3
           zip -r9 An-UNKNOWN-${{ env.FILE_TAG }}-"$(/bin/date -u '+%Y%m%d-%H%M')".zip .
 
-      # Release kernel to GitHub
-      - name: Release Kernel TO GitHub
-        uses: marvinpinto/action-automatic-releases@latest
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          title: ${{ env.FILE_TAG }}
-          automatic_release_tag: ${{ env.FILE_TAG }}
-          prerelease: false
-          files: |
-            out/AK3/*.zip
-            out/arch/arm64/boot/Image.gz
-
       # Upload kernel artifacts
       - name: Upload Kernel Artifacts
         uses: actions/upload-artifact@v4.0.0
         with:
           name: Kernel_Output_${{ matrix.kernelsu_version.version }}
           path: |
-            out/arch
+            out/AK3/*.zip
+            out/arch/arm64/boot/Image.gz
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      # Download all artifacts from previous job
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4.0.0
+        with:
+          path: artifacts
+
+      # Create a single GitHub release
+      - name: Create GitHub Release
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Combined Kernel Release"
+          automatic_release_tag: "kernel-release-${{ github.run_number }}"
+          prerelease: false
+          files: |
+            artifacts/**
